@@ -1,5 +1,6 @@
 package patterns.singletonpattern;
 
+import patterns.compositeiterator.CompositeIterator;
 import patterns.compositepattern.Product;
 import patterns.compositepattern.ProductCategory;
 import patterns.compositepattern.ProductComponent;
@@ -29,6 +30,10 @@ public class InventoryManager {
         rootCategory.display();
     }
 
+    public ProductComponent getRootCategory() {
+        return rootCategory;
+    }
+
     public void addProduct(ProductComponent category, ProductComponent product) {
         try {
             category.add(product);
@@ -37,7 +42,7 @@ public class InventoryManager {
         }
     }
 
-    public void removeProduct(ProductComponent category, ProductComponent product) {
+    public void removeProductFromCategory(ProductComponent category, ProductComponent product) {
         try {
             if(category.isInCategory(product)){
                 category.remove(product);
@@ -77,6 +82,41 @@ public class InventoryManager {
             }
         } catch (UnsupportedOperationException e) {
             System.out.println("Cannot remove stock from a category");
+        }
+    }
+
+    public int getStock(ProductComponent product) {
+        try {
+            return product.getStock();
+        } catch (UnsupportedOperationException e) {
+            System.out.println("Cannot get stock for a category");
+            return -1;
+        }
+    }
+
+    public ProductComponent findProductByName(String name) {
+        CompositeIterator iterator = new CompositeIterator(rootCategory.createIterator());
+        while (iterator.hasNext()) {
+            ProductComponent component = iterator.next();
+            if (component.getName().equals(name)) {
+                return component;
+            }
+        }
+        return null;
+    }
+
+    public int getStockByName(String name) {
+        try {
+            ProductComponent product = findProductByName(name);
+            if (product != null) {
+                return product.getStock();
+            } else {
+                System.out.println("Product not found");
+                return -1;
+            }
+        } catch (UnsupportedOperationException e) {
+            System.out.println("Cannot get stock for a category");
+            return -1;
         }
     }
 }

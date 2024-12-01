@@ -1,5 +1,7 @@
 package patterns.compositepattern;
 
+import java.util.Iterator;
+
 public abstract class ProductComponent {
     public void add(ProductComponent component) {
         throw new UnsupportedOperationException();
@@ -26,6 +28,10 @@ public abstract class ProductComponent {
     }
 
     public boolean isInCategory(ProductComponent product) {
+        throw new UnsupportedOperationException();
+    }
+
+    public Iterator<ProductComponent> createIterator() {
         throw new UnsupportedOperationException();
     }
 

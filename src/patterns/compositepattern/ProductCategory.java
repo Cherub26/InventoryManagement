@@ -1,6 +1,7 @@
 package patterns.compositepattern;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public class ProductCategory extends ProductComponent {
@@ -13,7 +14,11 @@ public class ProductCategory extends ProductComponent {
 
     @Override
     public void add(ProductComponent component) {
-        components.add(component);
+        if (component instanceof Product) {
+            components.add(0, component); // Add Product at the beginning
+        } else if (component instanceof ProductCategory) {
+            components.add(component); // Add ProductCategory at the end
+        }
     }
 
     @Override
@@ -23,7 +28,7 @@ public class ProductCategory extends ProductComponent {
 
     @Override
     public ProductComponent getChild(int i) {
-        return (ProductComponent)components.get(i);
+        return components.get(i);
     }
 
     @Override
@@ -37,10 +42,12 @@ public class ProductCategory extends ProductComponent {
     }
 
     @Override
+    public Iterator<ProductComponent> createIterator() {
+        return components.iterator();
+    }
+
+    @Override
     public void display() {
         System.out.println("Category: " + categoryName);
-        for (ProductComponent component : components) {
-            component.display();
-        }
     }
 }
