@@ -2,6 +2,8 @@ package patterns.observerpattern;
 
 import patterns.compositepattern.Product;
 
+import javax.swing.JOptionPane;
+
 public class StockAlert implements Observer {
     private String alertName;
 
@@ -11,7 +13,10 @@ public class StockAlert implements Observer {
 
     public void update(Product product) {
         if (product.getStock() < 5) {
-            System.out.println("Alert: " + alertName + " - Product " + product.getName() + " is low on stock: " + product.getStock());
+            JOptionPane.showMessageDialog(null,
+                    "Alert: " + alertName + " - Product " + product.getName() + " is low on stock: " + product.getStock(),
+                    "Low Stock Alert",
+                    JOptionPane.WARNING_MESSAGE);
         }
     }
 

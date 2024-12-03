@@ -21,7 +21,7 @@ public class InventoryUserInterface extends JFrame {
         setLocationRelativeTo(null);
 
         JPanel panel = new JPanel();
-        panel.setLayout(new GridLayout(6, 1, 10, 10));
+        panel.setLayout(new GridLayout(8, 1, 10, 10));
         panel.setBorder(BorderFactory.createEmptyBorder(10, 100, 50, 100));
 
         JButton addProductButton = new JButton("Add New Product");
@@ -31,6 +31,14 @@ public class InventoryUserInterface extends JFrame {
         JButton updateStockButton = new JButton("Update Stock");
         updateStockButton.addActionListener(e -> updateStock());
         panel.add(updateStockButton);
+
+        JButton addStockButton = new JButton("Add Stock"); // New button
+        addStockButton.addActionListener(e -> addStock());
+        panel.add(addStockButton);
+
+        JButton removeStockButton = new JButton("Remove Stock"); // New button
+        removeStockButton.addActionListener(e -> removeStock());
+        panel.add(removeStockButton);
 
         JButton getStockButton = new JButton("Get Stock of a Product");
         getStockButton.addActionListener(e -> getStock());
@@ -101,6 +109,54 @@ public class InventoryUserInterface extends JFrame {
         }
     }
 
+    private void addStock() {
+        JPanel panel = new JPanel(new GridLayout(4, 1, 5, 5));
+        JLabel nameLabel = new JLabel("Product Name:");
+        JTextField nameField = new JTextField();
+        JLabel stockLabel = new JLabel("Stock Quantity to Add:");
+        JTextField stockField = new JTextField();
+
+        panel.add(nameLabel);
+        panel.add(nameField);
+        panel.add(stockLabel);
+        panel.add(stockField);
+
+        int option = JOptionPane.showConfirmDialog(this, panel, "Add Stock", JOptionPane.OK_CANCEL_OPTION);
+        if (option == JOptionPane.OK_OPTION) {
+            String name = nameField.getText();
+            int stock = Integer.parseInt(stockField.getText());
+
+            ProductComponent product = manager.findProductByName(name);
+            if (product != null) {
+                manager.addStock(product, stock);
+            }
+        }
+    }
+
+    private void removeStock() {
+        JPanel panel = new JPanel(new GridLayout(4, 1, 5, 5));
+        JLabel nameLabel = new JLabel("Product Name:");
+        JTextField nameField = new JTextField();
+        JLabel stockLabel = new JLabel("Stock Quantity to Remove:");
+        JTextField stockField = new JTextField();
+
+        panel.add(nameLabel);
+        panel.add(nameField);
+        panel.add(stockLabel);
+        panel.add(stockField);
+
+        int option = JOptionPane.showConfirmDialog(this, panel, "Remove Stock", JOptionPane.OK_CANCEL_OPTION);
+        if (option == JOptionPane.OK_OPTION) {
+            String name = nameField.getText();
+            int stock = Integer.parseInt(stockField.getText());
+
+            ProductComponent product = manager.findProductByName(name);
+            if (product != null) {
+                manager.removeStock(product, stock);
+            }
+        }
+    }
+
     private void getStock() {
         String name = JOptionPane.showInputDialog(this, "Enter Product Name:");
         if (name != null) {
@@ -164,11 +220,6 @@ public class InventoryUserInterface extends JFrame {
     }
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                new InventoryUserInterface().setVisible(true);
-            }
-        });
+        SwingUtilities.invokeLater(() -> new InventoryUserInterface().setVisible(true));
     }
 }
