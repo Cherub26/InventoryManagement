@@ -98,7 +98,7 @@ public class InventoryManager {
         CompositeIterator iterator = new CompositeIterator(rootCategory.createIterator());
         while (iterator.hasNext()) {
             ProductComponent component = iterator.next();
-            if (component.getName().equals(name)) {
+            if (component.getName().equalsIgnoreCase(name)) {
                 return component;
             }
         }
@@ -117,6 +117,24 @@ public class InventoryManager {
         } catch (UnsupportedOperationException e) {
             System.out.println("Cannot get stock for a category");
             return -1;
+        }
+    }
+
+    public void addCategory(String parentCategoryName, String newCategoryName) {
+        ProductCategory newCategory = new ProductCategory(newCategoryName);
+        if (parentCategoryName == null || parentCategoryName.isEmpty()) {
+            rootCategory.add(newCategory);
+        } else {
+            ProductComponent parentCategory = findProductByName(parentCategoryName);
+            if (parentCategory!=null) {
+                try{
+                    parentCategory.add(newCategory);
+                }catch(UnsupportedOperationException e){
+                    rootCategory.add(newCategory);
+                }
+            }else{
+                rootCategory.add(newCategory);
+            }
         }
     }
 }
