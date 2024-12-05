@@ -15,6 +15,11 @@ public class Product extends ProductComponent {
     }
 
     @Override
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    @Override
     public int getStock() {
         return stock;
     }

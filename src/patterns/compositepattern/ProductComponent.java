@@ -19,6 +19,10 @@ public abstract class ProductComponent {
         throw new UnsupportedOperationException();
     }
 
+    public void setName(String name) {
+        throw new UnsupportedOperationException();
+    }
+
     public int getStock() {
         throw new UnsupportedOperationException();
     }

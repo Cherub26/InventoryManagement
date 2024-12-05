@@ -54,6 +54,21 @@ public class InventoryManager {
         }
     }
 
+    public void changeProductName(ProductComponent product, String name) {
+        try {
+            product.setName(name);
+        } catch (UnsupportedOperationException e) {
+            System.out.println("Failed to change the name");
+        }
+    }
+
+    public void changeProductNameByName(String name, String newname){
+        ProductComponent product = findProductByName(name);
+        if(product != null){
+            changeProductName(product, newname);
+        }
+    }
+
     public void removeProductFromCategory(ProductComponent category, ProductComponent product) {
         try {
             if(category.isInCategory(product)){

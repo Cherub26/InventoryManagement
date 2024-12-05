@@ -37,6 +37,11 @@ public class ProductCategory extends ProductComponent {
     }
 
     @Override
+    public void setName(String name) {
+        this.categoryName = name;
+    }
+
+    @Override
     public boolean isInCategory(ProductComponent product) {
         return components.contains(product);
     }
