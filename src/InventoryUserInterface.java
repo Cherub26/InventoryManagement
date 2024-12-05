@@ -100,6 +100,10 @@ public class InventoryUserInterface extends JFrame {
 
                 if (name.isEmpty() || category.isEmpty()) {
                     JOptionPane.showMessageDialog(this, "Fields cannot be empty!", "Error", JOptionPane.ERROR_MESSAGE);
+                } else if (manager.findProductByName(name) != null) {
+                    JOptionPane.showMessageDialog(this, "Product with this name already exists!", "Error", JOptionPane.ERROR_MESSAGE);
+                } else if (manager.findProductByName(category) == null) {
+                    JOptionPane.showMessageDialog(this, "Category does not exist!", "Error", JOptionPane.ERROR_MESSAGE);
                 } else {
                     manager.addProductByName(category, name, stock);
                     JOptionPane.showMessageDialog(this, "Product added successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
@@ -135,8 +139,14 @@ public class InventoryUserInterface extends JFrame {
                 String name = nameField.getText().trim();
                 int stock = Integer.parseInt(stockField.getText().trim());
 
-                manager.setStockByName(name, stock);
-                JOptionPane.showMessageDialog(this, "Stock updated successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+                if (stock < 0) {
+                    JOptionPane.showMessageDialog(this, "Stock cannot be negative.", "Input Error", JOptionPane.ERROR_MESSAGE);
+                } else if (manager.findProductByName(name) == null) {
+                    JOptionPane.showMessageDialog(this, "Product not found.", "Error", JOptionPane.ERROR_MESSAGE);
+                } else {
+                    manager.setStockByName(name, stock);
+                    JOptionPane.showMessageDialog(this, "Stock updated successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+                }
             } catch (NumberFormatException ex) {
                 JOptionPane.showMessageDialog(this, "Please enter a valid stock quantity.", "Input Error", JOptionPane.ERROR_MESSAGE);
             }
@@ -195,8 +205,12 @@ public class InventoryUserInterface extends JFrame {
                 String name = nameField.getText().trim();
                 int stock = Integer.parseInt(stockField.getText().trim());
 
-                manager.addStockByName(name, stock);
-                JOptionPane.showMessageDialog(this, "Stock added successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+                if (manager.findProductByName(name) != null) {
+                    manager.addStockByName(name, stock);
+                    JOptionPane.showMessageDialog(this, "Stock added successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+                } else {
+                    JOptionPane.showMessageDialog(this, "Product not found.", "Error", JOptionPane.ERROR_MESSAGE);
+                }
             } catch (NumberFormatException ex) {
                 JOptionPane.showMessageDialog(this, "Please enter a valid stock quantity.", "Input Error", JOptionPane.ERROR_MESSAGE);
             }
@@ -263,7 +277,11 @@ public class InventoryUserInterface extends JFrame {
             }
 
             int stock = manager.getStockByName(name);
-            JOptionPane.showMessageDialog(this, "Stock of " + name + ": " + stock, "Product Stock", JOptionPane.INFORMATION_MESSAGE);
+            if (stock == -1) {
+                JOptionPane.showMessageDialog(this, "Product not found.", "Error", JOptionPane.ERROR_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(this, "Stock of " + name + ": " + stock, "Product Stock", JOptionPane.INFORMATION_MESSAGE);
+            }
         }
     }
 
@@ -308,18 +326,26 @@ public class InventoryUserInterface extends JFrame {
             int column = e.getColumn();
 
             if (column == 1 || column == 2) {  // Product Name or Stock column
-                String fieldCategory = model.getValueAt(row, 0).toString();
                 String fieldName = model.getValueAt(row, 1).toString();
                 int fieldStock = Integer.parseInt(model.getValueAt(row, 2).toString());
 
-                String category = products.get(row)[0].toString();
                 String productName = products.get(row)[1].toString();
                 int stock = Integer.parseInt(products.get(row)[2].toString());
 
                 if (column == 1) {
-                    manager.changeProductNameByName(productName, fieldName);
+                    if (fieldName.trim().isEmpty()) {
+                        JOptionPane.showMessageDialog(this, "Product name cannot be empty.", "Input Error", JOptionPane.ERROR_MESSAGE);
+                        model.setValueAt(productName, row, column); // Revert to the original value
+                    } else {
+                        manager.changeProductNameByName(productName, fieldName);
+                    }
                 } else if (column == 2) {
-                    manager.setStockByName(productName, fieldStock);
+                    if (fieldStock < 0) {
+                        JOptionPane.showMessageDialog(this, "Stock cannot be negative.", "Input Error", JOptionPane.ERROR_MESSAGE);
+                        model.setValueAt(stock, row, column); // Revert to the original value
+                    } else {
+                        manager.setStockByName(productName, fieldStock);
+                    }
                 }
             }
         });
