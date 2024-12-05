@@ -46,6 +46,10 @@ public class ProductCategory extends ProductComponent {
         return components.contains(product);
     }
 
+    public List<ProductComponent> getComponents() {
+        return components;
+    }
+
     @Override
     public Iterator<ProductComponent> createIterator() {
         return components.iterator();

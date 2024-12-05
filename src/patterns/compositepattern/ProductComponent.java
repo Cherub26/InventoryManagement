@@ -1,6 +1,7 @@
 package patterns.compositepattern;
 
 import java.util.Iterator;
+import java.util.List;
 
 public abstract class ProductComponent {
     public void add(ProductComponent component) {
@@ -32,6 +33,10 @@ public abstract class ProductComponent {
     }
 
     public boolean isInCategory(ProductComponent product) {
+        throw new UnsupportedOperationException();
+    }
+
+    public List<ProductComponent> getComponents() {
         throw new UnsupportedOperationException();
     }
 

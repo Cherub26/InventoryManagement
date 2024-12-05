@@ -1,7 +1,13 @@
+import patterns.compositepattern.Product;
+import patterns.compositepattern.ProductCategory;
+import patterns.compositepattern.ProductComponent;
 import patterns.singletonpattern.InventoryManager;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeModel;
 import java.awt.*;
 import java.util.List;
 import java.util.Map;
@@ -30,20 +36,21 @@ public class InventoryUserInterface extends JFrame {
 
         // Buttons panel
         JPanel buttonPanel = new JPanel();
-        buttonPanel.setLayout(new GridLayout(8, 1, 10, 10));
+        buttonPanel.setLayout(new GridLayout(9, 1, 10, 10));
         buttonPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
         // Button customization
         String[] buttonTexts = {
                 "Add New Product", "Update Stock", "Add Stock",
                 "Remove Stock", "Get Stock of a Product",
-                "List All Categories", "List All Products", "Exit"
+                "List All Categories", "List All Products", "Display Inventory Tree",
+                "Exit"
         };
 
         Runnable[] actions = {
                 this::addProduct, this::updateStock, this::addStock,
                 this::removeStock, this::getStock, this::listAllCategories,
-                this::listAllProducts, () -> System.exit(0)
+                this::listAllProducts, this::displayTree, () -> System.exit(0)
         };
 
         for (int i = 0; i < buttonTexts.length; i++) {
@@ -65,6 +72,34 @@ public class InventoryUserInterface extends JFrame {
         button.setToolTipText("Click to " + text.toLowerCase());
         button.addActionListener(e -> action.run());
         return button;
+    }
+
+    private TreeModel buildTreeModel() {
+        DefaultMutableTreeNode root = new DefaultMutableTreeNode(manager.getRootCategory().getName());
+        for (ProductComponent child : manager.getRootCategory().getComponents()) {
+            addCategoriesToNode(root, child);
+        }
+        return new DefaultTreeModel(root);
+    }
+
+    private void addCategoriesToNode(DefaultMutableTreeNode parent, ProductComponent component) {
+        if (component instanceof ProductCategory) {
+            DefaultMutableTreeNode categoryNode = new DefaultMutableTreeNode(component.getName());
+            parent.add(categoryNode);
+            for (ProductComponent child : (component).getComponents()) {
+                addCategoriesToNode(categoryNode, child);
+            }
+        } else if (component instanceof Product) {
+            DefaultMutableTreeNode productNode = new DefaultMutableTreeNode(component.getName() + " (Stock: " + component.getStock() + ")");
+            parent.add(productNode);
+        }
+    }
+
+    private void displayTree() {
+        JTree tree = new JTree(buildTreeModel());
+        JScrollPane scrollPane = new JScrollPane(tree);
+        scrollPane.setPreferredSize(new Dimension(500, 400));
+        JOptionPane.showMessageDialog(this, scrollPane, "Inventory Tree", JOptionPane.PLAIN_MESSAGE);
     }
 
     private void addProduct() {
