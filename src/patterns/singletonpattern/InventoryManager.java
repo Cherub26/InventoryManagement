@@ -126,11 +126,17 @@ public class InventoryManager {
         }
     }
 
-    public void removeStockByName(String name, int stock) {
+    public boolean removeStockByName(String name, int stock) {
         ProductComponent product = findProductByName(name);
         if (product != null) {
-            removeStock(product, stock);
+            if (product.getStock() >= stock) {
+                removeStock(product, stock);
+                return true;
+            } else {
+                return false;
+            }
         }
+        return false;
     }
 
     public int getStock(ProductComponent product) {

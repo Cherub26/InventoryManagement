@@ -100,6 +100,8 @@ public class InventoryUserInterface extends JFrame {
 
                 if (name.isEmpty() || category.isEmpty()) {
                     JOptionPane.showMessageDialog(this, "Fields cannot be empty!", "Error", JOptionPane.ERROR_MESSAGE);
+                } else if (stock < 0) {
+                    JOptionPane.showMessageDialog(this, "Stock quantity can't be lower than zero.", "Input Error", JOptionPane.ERROR_MESSAGE);
                 } else if (manager.findProductByName(name) != null) {
                     JOptionPane.showMessageDialog(this, "Product with this name already exists!", "Error", JOptionPane.ERROR_MESSAGE);
                 } else if (manager.findProductByName(category) == null) {
@@ -141,11 +143,11 @@ public class InventoryUserInterface extends JFrame {
 
                 if (stock < 0) {
                     JOptionPane.showMessageDialog(this, "Stock cannot be negative.", "Input Error", JOptionPane.ERROR_MESSAGE);
-                } else if (manager.findProductByName(name) == null) {
-                    JOptionPane.showMessageDialog(this, "Product not found.", "Error", JOptionPane.ERROR_MESSAGE);
-                } else {
+                } else if (manager.findProductByName(name) != null) {
                     manager.setStockByName(name, stock);
                     JOptionPane.showMessageDialog(this, "Stock updated successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+                } else {
+                    JOptionPane.showMessageDialog(this, "Product not found.", "Error", JOptionPane.ERROR_MESSAGE);
                 }
             } catch (NumberFormatException ex) {
                 JOptionPane.showMessageDialog(this, "Please enter a valid stock quantity.", "Input Error", JOptionPane.ERROR_MESSAGE);
@@ -205,7 +207,9 @@ public class InventoryUserInterface extends JFrame {
                 String name = nameField.getText().trim();
                 int stock = Integer.parseInt(stockField.getText().trim());
 
-                if (manager.findProductByName(name) != null) {
+                if (stock <= 0) {
+                    JOptionPane.showMessageDialog(this, "Quantity to add must be greater than zero.", "Input Error", JOptionPane.ERROR_MESSAGE);
+                } else if (manager.findProductByName(name) != null) {
                     manager.addStockByName(name, stock);
                     JOptionPane.showMessageDialog(this, "Stock added successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
                 } else {
@@ -242,8 +246,20 @@ public class InventoryUserInterface extends JFrame {
                 String name = nameField.getText().trim();
                 int stock = Integer.parseInt(stockField.getText().trim());
 
-                manager.removeStockByName(name, stock);
-                JOptionPane.showMessageDialog(this, "Stock removed successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+                if (stock <= 0) {
+                    JOptionPane.showMessageDialog(this, "Quantity to remove must be greater than zero.", "Input Error", JOptionPane.ERROR_MESSAGE);
+                } else {
+                    if (manager.findProductByName(name) != null) {
+                        boolean wasSuccess = manager.removeStockByName(name, stock);
+                        if(wasSuccess){
+                            JOptionPane.showMessageDialog(this, "Stock removed successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+                        }else{
+                            JOptionPane.showMessageDialog(this, "Not enough stock to remove.", "Error", JOptionPane.ERROR_MESSAGE);
+                        }
+                    } else {
+                        JOptionPane.showMessageDialog(this, "Product not found.", "Error", JOptionPane.ERROR_MESSAGE);
+                    }
+                }
             } catch (NumberFormatException ex) {
                 JOptionPane.showMessageDialog(this, "Please enter a valid stock quantity.", "Input Error", JOptionPane.ERROR_MESSAGE);
             }
