@@ -8,6 +8,11 @@ import patterns.observerpattern.Observer;
 import patterns.observerpattern.StockManager;
 import patterns.observerpattern.Subject;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 public class InventoryManager {
     private static final InventoryManager instance = new InventoryManager();
     private ProductComponent rootCategory;
@@ -42,6 +47,13 @@ public class InventoryManager {
         }
     }
 
+    public void addProductByName(String categoryName, String productName, int stock) {
+        ProductComponent category = findProductByName(categoryName);
+        if (category != null) {
+            addProduct(category, new Product(productName, stock));
+        }
+    }
+
     public void removeProductFromCategory(ProductComponent category, ProductComponent product) {
         try {
             if(category.isInCategory(product)){
@@ -63,12 +75,26 @@ public class InventoryManager {
         }
     }
 
+    public void setStockByName(String name, int stock) {
+        ProductComponent product = findProductByName(name);
+        if (product != null) {
+            setStock(product, stock);
+        }
+    }
+
     public void addStock(ProductComponent product, int stock) {
         try {
             product.setStock(product.getStock() + stock);
             stockManager.notifyObservers((Product)product);
         } catch (UnsupportedOperationException e) {
             System.out.println("Cannot add stock to a category");
+        }
+    }
+
+    public void addStockByName(String name, int stock) {
+        ProductComponent product = findProductByName(name);
+        if (product != null) {
+            addStock(product, stock);
         }
     }
 
@@ -82,6 +108,13 @@ public class InventoryManager {
             }
         } catch (UnsupportedOperationException e) {
             System.out.println("Cannot remove stock from a category");
+        }
+    }
+
+    public void removeStockByName(String name, int stock) {
+        ProductComponent product = findProductByName(name);
+        if (product != null) {
+            removeStock(product, stock);
         }
     }
 
@@ -118,6 +151,43 @@ public class InventoryManager {
             System.out.println("Cannot get stock for a category");
             return -1;
         }
+    }
+
+    public Map<String, Integer> getCategoryStocks() {
+        Map<String, Integer> categoryStocks = new HashMap<>();
+        CompositeIterator iterator = new CompositeIterator(rootCategory.createIterator());
+
+        String currentCategory = null;
+        while (iterator.hasNext()) {
+            ProductComponent component = iterator.next();
+            if (component instanceof ProductCategory) {
+                currentCategory = component.getName();
+            } else if (component instanceof Product) {
+                int stock = component.getStock();
+                categoryStocks.put(currentCategory, categoryStocks.getOrDefault(currentCategory, 0) + stock);
+            }
+        }
+        return categoryStocks;
+    }
+
+    public List<Object[]> getAllProducts() {
+        List<Object[]> products = new ArrayList<>();
+        CompositeIterator iterator = new CompositeIterator(rootCategory.createIterator());
+
+        String currentCategory = null;
+        while (iterator.hasNext()) {
+            ProductComponent component = iterator.next();
+            if (component instanceof ProductCategory) {
+                currentCategory = component.getName();
+            } else if (component instanceof Product) {
+                products.add(new Object[]{
+                        currentCategory,
+                        component.getName(),
+                        component.getStock()
+                });
+            }
+        }
+        return products;
     }
 
     public void addCategory(String parentCategoryName, String newCategoryName) {

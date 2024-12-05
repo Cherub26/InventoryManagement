@@ -1,13 +1,9 @@
-import patterns.compositeiterator.CompositeIterator;
-import patterns.compositepattern.Product;
-import patterns.compositepattern.ProductCategory;
-import patterns.compositepattern.ProductComponent;
 import patterns.singletonpattern.InventoryManager;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class InventoryUserInterface extends JFrame {
@@ -32,11 +28,11 @@ public class InventoryUserInterface extends JFrame {
         updateStockButton.addActionListener(e -> updateStock());
         panel.add(updateStockButton);
 
-        JButton addStockButton = new JButton("Add Stock"); // New button
+        JButton addStockButton = new JButton("Add Stock");
         addStockButton.addActionListener(e -> addStock());
         panel.add(addStockButton);
 
-        JButton removeStockButton = new JButton("Remove Stock"); // New button
+        JButton removeStockButton = new JButton("Remove Stock");
         removeStockButton.addActionListener(e -> removeStock());
         panel.add(removeStockButton);
 
@@ -78,15 +74,12 @@ public class InventoryUserInterface extends JFrame {
             int stock = Integer.parseInt(stockField.getText());
             String category = categoryField.getText();
 
-            ProductComponent categoryComponent = manager.findProductByName(category);
-            if (categoryComponent != null) {
-                manager.addProduct(categoryComponent, new Product(name, stock));
-            }
+            manager.addProductByName(category, name, stock);
         }
     }
 
     private void updateStock() {
-        JPanel panel = new JPanel(new GridLayout(4, 1, 5, 5)); // Reduced gaps to 5 pixels
+        JPanel panel = new JPanel(new GridLayout(4, 1, 5, 5));
         JLabel nameLabel = new JLabel("Product Name:");
         JTextField nameField = new JTextField();
         JLabel stockLabel = new JLabel("New Stock Quantity:");
@@ -102,10 +95,7 @@ public class InventoryUserInterface extends JFrame {
             String name = nameField.getText();
             int stock = Integer.parseInt(stockField.getText());
 
-            ProductComponent product = manager.findProductByName(name);
-            if (product != null) {
-                manager.setStock(product, stock);
-            }
+            manager.setStockByName(name, stock);
         }
     }
 
@@ -126,10 +116,7 @@ public class InventoryUserInterface extends JFrame {
             String name = nameField.getText();
             int stock = Integer.parseInt(stockField.getText());
 
-            ProductComponent product = manager.findProductByName(name);
-            if (product != null) {
-                manager.addStock(product, stock);
-            }
+            manager.addStockByName(name, stock);
         }
     }
 
@@ -150,21 +137,14 @@ public class InventoryUserInterface extends JFrame {
             String name = nameField.getText();
             int stock = Integer.parseInt(stockField.getText());
 
-            ProductComponent product = manager.findProductByName(name);
-            if (product != null) {
-                manager.removeStock(product, stock);
-            }
+            manager.removeStockByName(name, stock);
         }
     }
 
     private void getStock() {
         String name = JOptionPane.showInputDialog(this, "Enter Product Name:");
         if (name != null) {
-            ProductComponent product = manager.findProductByName(name);
-            int stock = -1;
-            if(product!=null){
-                stock = manager.getStock(product);
-            }
+            int stock = manager.getStockByName(name);
             JOptionPane.showMessageDialog(this, "Stock of " + name + ": " + stock);
         }
     }
@@ -172,19 +152,7 @@ public class InventoryUserInterface extends JFrame {
     private void listAllCategories() {
         String[] columnNames = {"Category", "Total Stock"};
         DefaultTableModel model = new DefaultTableModel(columnNames, 0);
-        CompositeIterator iterator = new CompositeIterator(manager.getRootCategory().createIterator());
-        Map<String, Integer> categoryStocks = new HashMap<>();
-
-        String currentCategory = null;
-        while (iterator.hasNext()) {
-            ProductComponent component = iterator.next();
-            if (component instanceof ProductCategory) {
-                currentCategory = component.getName();
-            } else if (component instanceof Product) {
-                int stock = component.getStock();
-                categoryStocks.put(currentCategory, categoryStocks.getOrDefault(currentCategory, 0) + stock);
-            }
-        }
+        Map<String, Integer> categoryStocks = manager.getCategoryStocks();
 
         for (Map.Entry<String, Integer> entry : categoryStocks.entrySet()) {
             model.addRow(new Object[]{entry.getKey(), entry.getValue()});
@@ -198,20 +166,10 @@ public class InventoryUserInterface extends JFrame {
     private void listAllProducts() {
         String[] columnNames = {"Category", "Product Name", "Stock"};
         DefaultTableModel model = new DefaultTableModel(columnNames, 0);
-        CompositeIterator iterator = new CompositeIterator(manager.getRootCategory().createIterator());
+        List<Object[]> products = manager.getAllProducts();
 
-        String currentCategory = null;
-        while (iterator.hasNext()) {
-            ProductComponent component = iterator.next();
-            if (component instanceof ProductCategory) {
-                currentCategory = component.getName();
-            } else if (component instanceof Product) {
-                model.addRow(new Object[]{
-                        currentCategory,
-                        component.getName(),
-                        component.getStock()
-                });
-            }
+        for (Object[] product : products) {
+            model.addRow(product);
         }
 
         JTable table = new JTable(model);
