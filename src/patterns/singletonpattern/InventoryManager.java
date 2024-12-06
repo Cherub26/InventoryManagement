@@ -113,28 +113,26 @@ public class InventoryManager {
         }
     }
 
-    public void removeStock(ProductComponent product, int stock) {
+    public boolean removeStock(ProductComponent product, int stock) {
         try {
             if(product.getStock() >= stock){
                 product.setStock(product.getStock() - stock);
                 stockManager.notifyObservers((Product)product);
+                return true;
             }else{
                 System.out.println("Not enough stock");
+                return false;
             }
         } catch (UnsupportedOperationException e) {
             System.out.println("Cannot remove stock from a category");
+            return false;
         }
     }
 
     public boolean removeStockByName(String name, int stock) {
         ProductComponent product = findProductByName(name);
         if (product != null) {
-            if (product.getStock() >= stock) {
-                removeStock(product, stock);
-                return true;
-            } else {
-                return false;
-            }
+            return removeStock(product, stock);
         }
         return false;
     }
@@ -227,5 +225,62 @@ public class InventoryManager {
                 rootCategory.add(newCategory);
             }
         }
+    }
+
+    public void changeToRootCategory(String name) {
+        ProductComponent component = findProductByName(name);
+        if (component != null) {
+            // Find the current category of the component
+            ProductCategory currentCategory = findCurrentCategory(component);
+
+            // Remove the component from the current category
+            if (currentCategory != null) {
+                currentCategory.remove(component);
+            }
+
+            // Add the component to the root category
+            rootCategory.add(component);
+        }
+    }
+
+    private ProductCategory findCurrentCategory(ProductComponent component) {
+        CompositeIterator iterator = new CompositeIterator(rootCategory.createIterator());
+        ProductCategory currentCategory = null;
+        while (iterator.hasNext()) {
+            ProductComponent temp = iterator.next();
+            if (temp instanceof ProductCategory && temp.isInCategory(component)) {
+                currentCategory = (ProductCategory) temp;
+                return currentCategory;
+            }
+        }
+        return null;
+    }
+
+    public boolean changeProductCategoryByName(String productName, String newCategoryName) {
+        ProductComponent product = findProductByName(productName);
+        ProductComponent newCategory = findProductByName(newCategoryName);
+
+        if (product != null && newCategory instanceof ProductCategory) {
+            // Find the current category of the product
+            ProductCategory currentCategory = findCurrentCategory(product);
+
+            try{
+                if (product.isSubcategory(newCategory)) {
+                    return false; // Indicate failure
+                }
+            } catch (UnsupportedOperationException e) {
+                // Discard the error.
+            }
+
+            // Remove the product from the current category
+            if (currentCategory != null) {
+                currentCategory.remove(product);
+            }
+
+            // Add the product to the new category
+            newCategory.add(product);
+            return true; // Indicate success
+        }
+        return false; // Indicate failure
     }
 }

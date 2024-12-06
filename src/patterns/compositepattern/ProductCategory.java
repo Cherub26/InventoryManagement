@@ -46,8 +46,23 @@ public class ProductCategory extends ProductComponent {
         return components.contains(product);
     }
 
+    @Override
     public List<ProductComponent> getComponents() {
         return components;
+    }
+
+    @Override
+    public boolean isSubcategory(ProductComponent category) {
+        for (ProductComponent component : components) {
+            if (component == category) {
+                return true;
+            } else if (component instanceof ProductCategory) {
+                if (component.isSubcategory(category)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     @Override

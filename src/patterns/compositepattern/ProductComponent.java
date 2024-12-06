@@ -16,13 +16,9 @@ public abstract class ProductComponent {
         throw new UnsupportedOperationException();
     }
 
-    public String getName() {
-        throw new UnsupportedOperationException();
-    }
+    public abstract String getName();
 
-    public void setName(String name) {
-        throw new UnsupportedOperationException();
-    }
+    public abstract void setName(String name);
 
     public int getStock() {
         throw new UnsupportedOperationException();
@@ -41,6 +37,10 @@ public abstract class ProductComponent {
     }
 
     public Iterator<ProductComponent> createIterator() {
+        throw new UnsupportedOperationException();
+    }
+
+    public boolean isSubcategory(ProductComponent category) {
         throw new UnsupportedOperationException();
     }
 
