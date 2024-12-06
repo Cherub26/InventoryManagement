@@ -2,6 +2,6 @@ package patterns.factorymethodpattern;
 
 import patterns.compositepattern.ProductComponent;
 
-public abstract class Factory {
-    public abstract ProductComponent create(String name);
+public abstract class Factory<T> {
+    public abstract T create(String name);
 }
