@@ -7,6 +7,10 @@ import patterns.compositepattern.ProductComponent;
 import patterns.observerpattern.Observer;
 import patterns.observerpattern.StockManager;
 import patterns.observerpattern.Subject;
+import patterns.factorymethodpattern.Factory;
+import patterns.factorymethodpattern.ProductFactory;
+import patterns.factorymethodpattern.ProductCategoryFactory;
+import patterns.factorymethodpattern.StockManagerFactory;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -17,10 +21,18 @@ public class InventoryManager {
     private static final InventoryManager instance = new InventoryManager();
     private ProductComponent rootCategory;
     private Subject stockManager;
+    private Factory<ProductComponent> categoryFactory;
+    private Factory<ProductComponent> productFactory;
+    private Factory<Subject> stockManagerFactory;
 
     private InventoryManager() {
-        this.rootCategory = new ProductCategory("Products");
-        this.stockManager = new StockManager();
+        this.categoryFactory = new ProductCategoryFactory();
+        this.productFactory = new ProductFactory();
+        this.stockManagerFactory = new StockManagerFactory();
+        
+        // Factory kullanarak nesneleri oluştur
+        this.rootCategory = categoryFactory.create("Products");
+        this.stockManager = stockManagerFactory.create("StockManager");
     }
 
     public void addAlert(Observer alert) {
@@ -50,7 +62,9 @@ public class InventoryManager {
     public void addProductByName(String categoryName, String productName, int stock) {
         ProductComponent category = findProductByName(categoryName);
         if (category != null) {
-            addProduct(category, new Product(productName, stock));
+            ProductComponent product = productFactory.create(productName);
+            product.setStock(stock);
+            addProduct(category, product);
         }
     }
 
@@ -210,18 +224,18 @@ public class InventoryManager {
     }
 
     public void addCategory(String parentCategoryName, String newCategoryName) {
-        ProductCategory newCategory = new ProductCategory(newCategoryName);
+        ProductComponent newCategory = categoryFactory.create(newCategoryName);
         if (parentCategoryName == null || parentCategoryName.isEmpty()) {
             rootCategory.add(newCategory);
         } else {
             ProductComponent parentCategory = findProductByName(parentCategoryName);
-            if (parentCategory!=null) {
-                try{
+            if (parentCategory != null) {
+                try {
                     parentCategory.add(newCategory);
-                }catch(UnsupportedOperationException e){
+                } catch (UnsupportedOperationException e) {
                     rootCategory.add(newCategory);
                 }
-            }else{
+            } else {
                 rootCategory.add(newCategory);
             }
         }
