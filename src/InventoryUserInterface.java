@@ -41,7 +41,8 @@ public class InventoryUserInterface extends JFrame {
 
         // Button customization
         String[] buttonTexts = {
-                "Add New Product", "Update Stock", "Add Stock",
+                "Add New Product", "Add New Category",
+                "Update Stock", "Add Stock",
                 "Remove Stock", "Get Stock of a Product",
                 "Change Product or Category Name", "Change Category of a Subcategory or a Product",
                 "List All Categories", "List All Products",
@@ -49,7 +50,8 @@ public class InventoryUserInterface extends JFrame {
         };
 
         Runnable[] actions = {
-                this::addProduct, this::updateStock, this::addStock,
+                this::addProduct, this::addCategory,
+                this::updateStock, this::addStock,
                 this::removeStock, this::getStock,
                 this::changeName, this::changeCategory,
                 this::listAllCategories, this::listAllProducts,
@@ -149,6 +151,54 @@ public class InventoryUserInterface extends JFrame {
                 }
             } catch (NumberFormatException ex) {
                 JOptionPane.showMessageDialog(this, "Please enter a valid stock quantity.", "Input Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
+
+    private void addCategory() {
+        JPanel panel = new JPanel(new BorderLayout(10, 10));
+        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+        JLabel titleLabel = new JLabel("Add a New Category", JLabel.CENTER);
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 18));
+        panel.add(titleLabel, BorderLayout.NORTH);
+
+        JPanel inputPanel = new JPanel(new GridLayout(3, 2, 10, 10));
+        JTextField categoryNameField = createPlaceholderField("");
+        JTextField parentCategoryField = createPlaceholderField("");
+
+        inputPanel.add(new JLabel("Category Name:"));
+        inputPanel.add(categoryNameField);
+        inputPanel.add(new JLabel("Parent Category:"));
+        inputPanel.add(parentCategoryField);
+        inputPanel.add(new JLabel("")); // Empty label for spacing
+        inputPanel.add(new JLabel("<html>Leave blank to make<br>the parent root category.</html>"));
+
+        panel.add(inputPanel, BorderLayout.CENTER);
+
+        int option = JOptionPane.showConfirmDialog(this, panel, "Add New Category", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+        if (option == JOptionPane.OK_OPTION) {
+            String parentCategoryName = parentCategoryField.getText().trim();
+            String categoryName = categoryNameField.getText().trim();
+
+            if (categoryName.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Category name cannot be empty!", "Error", JOptionPane.ERROR_MESSAGE);
+            } else if (manager.findProductByName(categoryName) != null) {
+                JOptionPane.showMessageDialog(this, "Category or Product with this name already exists!", "Error", JOptionPane.ERROR_MESSAGE);
+            } else {
+                ProductComponent newCategory = new ProductCategory(categoryName);
+                if (parentCategoryName.isEmpty()) {
+                    manager.getRootCategory().add(newCategory);
+                } else {
+                    ProductComponent parentCategory = manager.findProductByName(parentCategoryName);
+                    if (parentCategory instanceof ProductCategory) {
+                        parentCategory.add(newCategory);
+                    } else {
+                        JOptionPane.showMessageDialog(this, "Parent category does not exist!", "Error", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+                }
+                JOptionPane.showMessageDialog(this, "Category added successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
             }
         }
     }
@@ -372,7 +422,7 @@ public class InventoryUserInterface extends JFrame {
         inputPanel.add(new JLabel("New Category:"));
         inputPanel.add(newCategoryField);
         inputPanel.add(new JLabel("")); // Empty label for spacing
-        inputPanel.add(new JLabel("<html>Type root to make<br>the category the root category.</html>"));
+        inputPanel.add(new JLabel("<html>Leave this field blank to change<br>the category the root category.</html>"));
 
         panel.add(inputPanel, BorderLayout.CENTER);
 
