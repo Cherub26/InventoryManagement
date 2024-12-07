@@ -1,35 +1,45 @@
+import patterns.compositepattern.ProductComponent;
 import patterns.compositepattern.Product;
 import patterns.compositepattern.ProductCategory;
 import patterns.observerpattern.StockAlert;
 import patterns.singletonpattern.InventoryManager;
+import patterns.factorymethodpattern.Factory;
+import patterns.factorymethodpattern.ProductCategoryFactory;
+import patterns.factorymethodpattern.ProductFactory;
+import patterns.factorymethodpattern.AlertFactory;
+import patterns.observerpattern.Observer;
 
 public class Main {
     public static void main(String[] args) {
         InventoryManager inventoryManager = InventoryManager.getInstance();
+        Factory<ProductComponent> categoryFactory = new ProductCategoryFactory();
+        Factory<ProductComponent> productFactory = new ProductFactory();
+        Factory<Observer> alertFactory = new AlertFactory();
 
-        // Everything under here is testing code
-        ProductCategory electronics = new ProductCategory("Electronics");
-        ProductCategory clothing = new ProductCategory("Clothing");
-        ProductCategory phones = new ProductCategory("Phones");
-        ProductCategory laptops = new ProductCategory("Laptops");
-        ProductCategory men = new ProductCategory("Men");
-        ProductCategory women = new ProductCategory("Women");
+        // Kategorileri factory ile oluştur
+        ProductComponent electronics = categoryFactory.create("Electronics");
+        ProductComponent clothing = categoryFactory.create("Clothing");
+        ProductComponent phones = categoryFactory.create("Phones");
+        ProductComponent laptops = categoryFactory.create("Laptops");
+        ProductComponent men = categoryFactory.create("Men");
+        ProductComponent women = categoryFactory.create("Women");
         electronics.add(phones);
         electronics.add(laptops);
         clothing.add(men);
         clothing.add(women);
-        electronics.add(new Product("testingProduct", 9));
-        phones.add(new Product("iPhone", 50));
-        phones.add(new Product("Samsung Galaxy", 30));
-        laptops.add(new Product("MacBook Pro", 20));
-        laptops.add(new Product("Dell XPS", 15));
-        men.add(new Product("Men's T-Shirt", 100));
-        men.add(new Product("Men's Jeans", 60));
-        women.add(new Product("Women's Dress", 80));
-        women.add(new Product("Women's Skirt", 40));
+        electronics.add(productFactory.create("testingProduct"));
+        phones.add(productFactory.create("iPhone"));
+        phones.add(productFactory.create("Samsung Galaxy"));
+        laptops.add(productFactory.create("MacBook Pro"));
+        laptops.add(productFactory.create("Dell XPS"));
+        men.add(productFactory.create("Men's T-Shirt"));
+        men.add(productFactory.create("Men's Jeans"));
+        women.add(productFactory.create("Women's Dress"));
+        women.add(productFactory.create("Women's Skirt"));
         inventoryManager.getRootCategory().add(electronics);
         inventoryManager.getRootCategory().add(clothing);
-        inventoryManager.addAlert(new StockAlert("Stock Alert"));
+        Observer stockAlert = alertFactory.create("Stock Alert");
+        inventoryManager.addAlert(stockAlert);
 
         InventoryUserInterface.main(args);
     }
