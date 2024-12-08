@@ -1,5 +1,10 @@
 package patterns.compositepattern;
 
+
+/* The Product class represents a leaf node in the Composite pattern.
+ * It extends the ProductComponent class and provides implementations
+ * for the methods defined in the ProductComponent class.
+ */
 public class Product extends ProductComponent {
     private String name;
     private int stock;

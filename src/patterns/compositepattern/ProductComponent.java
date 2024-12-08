@@ -3,6 +3,7 @@ package patterns.compositepattern;
 import java.util.Iterator;
 import java.util.List;
 
+// This class is the Component in the Composite pattern
 public abstract class ProductComponent {
     public void add(ProductComponent component) {
         throw new UnsupportedOperationException();

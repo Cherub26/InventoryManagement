@@ -1,9 +1,13 @@
 package patterns.observerpattern;
 
 import patterns.compositepattern.Product;
-
 import javax.swing.JOptionPane;
 
+
+/*
+ * The StockAlert class implements the Observer interface.
+ * It is used to display an alert when the stock of a Product is low.
+ */
 public class StockAlert implements Observer {
     private String alertName;
 
@@ -11,6 +15,10 @@ public class StockAlert implements Observer {
         this.alertName = alertName;
     }
 
+    /*
+    * This method is called when the observed Product changes.
+    * If the stock of the product is less than 5, it displays a low stock alert.
+    */
     public void update(Product product) {
         if (product.getStock() < 5) {
             JOptionPane.showMessageDialog(null,
@@ -19,5 +27,4 @@ public class StockAlert implements Observer {
                     JOptionPane.WARNING_MESSAGE);
         }
     }
-
 }

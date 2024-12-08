@@ -12,9 +12,14 @@ import java.awt.*;
 import java.util.List;
 import java.util.Map;
 
+/*
+ * The InventoryUserInterface class represents the graphical user interface for the Inventory Management System.
+ * It provides various functionalities to manage products and categories, including adding, updating, and displaying inventory.
+ */
 public class InventoryUserInterface extends JFrame {
     private final InventoryManager manager;
 
+    // Constructs the InventoryUserInterface and initializes the GUI components.
     public InventoryUserInterface() {
         manager = InventoryManager.getInstance();
         setTitle("Inventory Management System");
@@ -67,6 +72,7 @@ public class InventoryUserInterface extends JFrame {
         add(mainPanel, BorderLayout.CENTER);
     }
 
+    // Creates a styled button with the specified text and action.
     private JButton createStyledButton(String text, Runnable action) {
         JButton button = new JButton(text);
         button.setFont(new Font("Arial", Font.PLAIN, 18));
@@ -79,6 +85,7 @@ public class InventoryUserInterface extends JFrame {
         return button;
     }
 
+    // Creates a JTextField with a placeholder text.
     private JTextField createPlaceholderField(String placeholder) {
         JTextField textField = new JTextField();
         textField.setFont(new Font("Arial", Font.ITALIC, 14));
@@ -106,6 +113,7 @@ public class InventoryUserInterface extends JFrame {
         return textField;
     }
 
+    // Displays a dialog to add a new product to the inventory.
     private void addProduct() {
         JPanel panel = new JPanel(new BorderLayout(10, 10));
         panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
@@ -155,6 +163,7 @@ public class InventoryUserInterface extends JFrame {
         }
     }
 
+    // Displays a dialog to add a new category to the inventory.
     private void addCategory() {
         JPanel panel = new JPanel(new BorderLayout(10, 10));
         panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
@@ -187,11 +196,11 @@ public class InventoryUserInterface extends JFrame {
                 JOptionPane.showMessageDialog(this, "Category or Product with this name already exists!", "Error", JOptionPane.ERROR_MESSAGE);
             } else {
                 ProductComponent newCategory = new ProductCategory(categoryName);
-                if (parentCategoryName.isEmpty()) {
+                if (parentCategoryName.isEmpty()) { // If the field is empty we add to the root category.
                     manager.getRootCategory().add(newCategory);
                 } else {
                     ProductComponent parentCategory = manager.findProductByName(parentCategoryName);
-                    if (parentCategory instanceof ProductCategory) {
+                    if (parentCategory instanceof ProductCategory) { // Checks if found productComponent is a category.
                         parentCategory.add(newCategory);
                     } else {
                         JOptionPane.showMessageDialog(this, "Parent category does not exist!", "Error", JOptionPane.ERROR_MESSAGE);
@@ -203,6 +212,7 @@ public class InventoryUserInterface extends JFrame {
         }
     }
 
+    // Displays a dialog to update the stock quantity of a product.
     private void updateStock() {
         JPanel panel = new JPanel(new BorderLayout(10, 10));
         panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
@@ -245,6 +255,7 @@ public class InventoryUserInterface extends JFrame {
         }
     }
 
+    // Displays a dialog to add stock to a product.
     private void addStock() {
         JPanel panel = new JPanel(new BorderLayout(10, 10));
         panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
@@ -287,6 +298,7 @@ public class InventoryUserInterface extends JFrame {
         }
     }
 
+    // Displays a dialog to remove stock from a product.
     private void removeStock() {
         JPanel panel = new JPanel(new BorderLayout(10, 10));
         panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
@@ -318,7 +330,7 @@ public class InventoryUserInterface extends JFrame {
                     ProductComponent product = manager.findProductByName(name);
                     if (product instanceof Product) {
                         boolean wasSuccess = manager.removeStock(product, stock);
-                        if(wasSuccess){
+                        if(wasSuccess){ // Checks if the stock was removed successfully and shows a dialog accordingly.
                             JOptionPane.showMessageDialog(this, "Stock removed successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
                         }else{
                             JOptionPane.showMessageDialog(this, "Not enough stock to remove.", "Error", JOptionPane.ERROR_MESSAGE);
@@ -333,6 +345,7 @@ public class InventoryUserInterface extends JFrame {
         }
     }
 
+    // Displays a dialog to get the stock quantity of a product.
     private void getStock() {
         JPanel panel = new JPanel(new BorderLayout(10, 10));
         panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
@@ -368,6 +381,7 @@ public class InventoryUserInterface extends JFrame {
         }
     }
 
+    //  Displays a dialog to change the name of a product or category.
     private void changeName() {
         JPanel panel = new JPanel(new BorderLayout(10, 10));
         panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
@@ -405,6 +419,7 @@ public class InventoryUserInterface extends JFrame {
         }
     }
 
+    // Displays a dialog to change the category of a product or subcategory.
     private void changeCategory() {
         JPanel panel = new JPanel(new BorderLayout(10, 10));
         panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
@@ -436,7 +451,7 @@ public class InventoryUserInterface extends JFrame {
                 JOptionPane.showMessageDialog(this, "Name field cannot be empty!", "Error", JOptionPane.ERROR_MESSAGE);
             } else if (manager.findProductByName(name) == null) {
                 JOptionPane.showMessageDialog(this, "Product or subcategory with the given name does not exist!", "Error", JOptionPane.ERROR_MESSAGE);
-            } else if (newCategoryName.isEmpty()) {
+            } else if (newCategoryName.isEmpty()) { // If the field is empty then we change the category to the root category.
                 manager.changeToRootCategory(name);
                 JOptionPane.showMessageDialog(this, "Category changed to root category successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
             }else {
@@ -460,6 +475,8 @@ public class InventoryUserInterface extends JFrame {
         }
     }
 
+
+    // Displays a dialog listing all categories and their total stock levels. Allows editing of category names.
     private void listAllCategories() {
         String[] columnNames = {"Category", "Total Stock"};
         DefaultTableModel model = new DefaultTableModel(columnNames, 0) {
@@ -507,6 +524,7 @@ public class InventoryUserInterface extends JFrame {
         JOptionPane.showMessageDialog(this, scrollPane, "All Categories", JOptionPane.PLAIN_MESSAGE);
     }
 
+    // Displays a dialog listing all products with their category, name, and stock level. Allows editing of every single field.
     private void listAllProducts() {
         String[] columnNames = {"Category", "Product Name", "Stock"};
         DefaultTableModel model = new DefaultTableModel(columnNames, 0) {
@@ -564,6 +582,7 @@ public class InventoryUserInterface extends JFrame {
         JOptionPane.showMessageDialog(this, scrollPane, "Products", JOptionPane.PLAIN_MESSAGE);
     }
 
+    // Builds a tree model representing the inventory structure.
     private TreeModel buildTreeModel() {
         DefaultMutableTreeNode root = new DefaultMutableTreeNode(manager.getRootCategory().getName());
         for (ProductComponent child : manager.getRootCategory().getComponents()) {
@@ -572,6 +591,7 @@ public class InventoryUserInterface extends JFrame {
         return new DefaultTreeModel(root);
     }
 
+    // Adds categories and products to a tree node recursively.
     private void addCategoriesToNode(DefaultMutableTreeNode parent, ProductComponent component) {
         if (component instanceof ProductCategory) {
             DefaultMutableTreeNode categoryNode = new DefaultMutableTreeNode(component.getName());
@@ -585,6 +605,7 @@ public class InventoryUserInterface extends JFrame {
         }
     }
 
+    // Displays a tree view of the inventory.
     private void displayTree() {
         JTree tree = new JTree(buildTreeModel());
         JScrollPane scrollPane = new JScrollPane(tree);

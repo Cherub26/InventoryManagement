@@ -17,6 +17,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * The InventoryManager class is a singleton that manages the inventory of products and categories.
+ * It provides methods to add, remove, and update products and categories, as well as manage stock levels.
+ */
 public class InventoryManager {
     private static final InventoryManager instance = new InventoryManager();
     private ProductComponent rootCategory;
@@ -25,12 +29,15 @@ public class InventoryManager {
     private Factory<ProductComponent> productFactory;
     private Factory<Subject> stockManagerFactory;
 
+    /**
+     * Private constructor to prevent instantiation from somewhere other than the class itself.
+     * Initializes the factories and creates the root category and stock manager.
+     */
     private InventoryManager() {
         this.categoryFactory = new ProductCategoryFactory();
         this.productFactory = new ProductFactory();
         this.stockManagerFactory = new StockManagerFactory();
-        
-        // Factory kullanarak nesneleri oluştur
+
         this.rootCategory = categoryFactory.create("Products");
         this.stockManager = stockManagerFactory.create("StockManager");
     }
@@ -39,6 +46,7 @@ public class InventoryManager {
         stockManager.registerObserver(alert);
     }
 
+    // Returns the singleton instance of InventoryManager.
     public static InventoryManager getInstance() {
         return instance;
     }
@@ -51,6 +59,7 @@ public class InventoryManager {
         return rootCategory;
     }
 
+    // Adds a product to a specified category.
     public void addProduct(ProductComponent category, ProductComponent product) {
         try {
             category.add(product);
@@ -59,6 +68,7 @@ public class InventoryManager {
         }
     }
 
+    // Adds a product to a category by their names and sets the stock using addProduct method.
     public void addProductByName(String categoryName, String productName, int stock) {
         ProductComponent category = findProductByName(categoryName);
         if (category != null) {
@@ -68,6 +78,7 @@ public class InventoryManager {
         }
     }
 
+    // Changes the name of a product.
     public void changeProductName(ProductComponent product, String name) {
         try {
             product.setName(name);
@@ -76,13 +87,15 @@ public class InventoryManager {
         }
     }
 
-    public void changeProductNameByName(String name, String newname){
+    // Changes the name of a product by its current name using changeProductName method.
+    public void changeProductNameByName(String name, String newName){
         ProductComponent product = findProductByName(name);
         if(product != null){
-            changeProductName(product, newname);
+            changeProductName(product, newName);
         }
     }
 
+    // Removes a product from a specified category.
     public void removeProductFromCategory(ProductComponent category, ProductComponent product) {
         try {
             if(category.isInCategory(product)){
@@ -95,6 +108,7 @@ public class InventoryManager {
         }
     }
 
+    // Sets the stock level of a product and notifies observers.
     public void setStock(ProductComponent product, int stock) {
         try {
             product.setStock(stock);
@@ -104,6 +118,7 @@ public class InventoryManager {
         }
     }
 
+    // Sets the stock level of a product by its name using the setStock method.
     public void setStockByName(String name, int stock) {
         ProductComponent product = findProductByName(name);
         if (product != null) {
@@ -111,6 +126,7 @@ public class InventoryManager {
         }
     }
 
+    // Adds stock to a product and notifies observers.
     public void addStock(ProductComponent product, int stock) {
         try {
             product.setStock(product.getStock() + stock);
@@ -120,6 +136,7 @@ public class InventoryManager {
         }
     }
 
+    // Adds stock to a product by its name using the addStock method.
     public void addStockByName(String name, int stock) {
         ProductComponent product = findProductByName(name);
         if (product != null) {
@@ -127,11 +144,11 @@ public class InventoryManager {
         }
     }
 
+    // Removes stock from a product and notifies observers using setStock method.
     public boolean removeStock(ProductComponent product, int stock) {
         try {
-            if(product.getStock() >= stock){
+            if(product.getStock() >= stock){ // Check if there is enough stock to remove.
                 product.setStock(product.getStock() - stock);
-                stockManager.notifyObservers((Product)product);
                 return true;
             }else{
                 System.out.println("Not enough stock");
@@ -143,6 +160,7 @@ public class InventoryManager {
         }
     }
 
+    // Removes stock from a product by its name and notifies observers using the removeStock method.
     public boolean removeStockByName(String name, int stock) {
         ProductComponent product = findProductByName(name);
         if (product != null) {
@@ -151,6 +169,7 @@ public class InventoryManager {
         return false;
     }
 
+    // Returns the stock level of a product.
     public int getStock(ProductComponent product) {
         try {
             return product.getStock();
@@ -160,6 +179,7 @@ public class InventoryManager {
         }
     }
 
+    // Finds a product by its name uses the CompositeIterator to iterate through the categories and products.
     public ProductComponent findProductByName(String name) {
         CompositeIterator iterator = new CompositeIterator(rootCategory.createIterator());
         while (iterator.hasNext()) {
@@ -171,6 +191,7 @@ public class InventoryManager {
         return null;
     }
 
+    // Returns the stock level of a product by its name.
     public int getStockByName(String name) {
         try {
             ProductComponent product = findProductByName(name);
@@ -186,6 +207,7 @@ public class InventoryManager {
         }
     }
 
+    // Returns a map of category names to their total stock levels uses the CompositeIterator to iterate through the categories and products.
     public Map<String, Integer> getCategoryStocks() {
         Map<String, Integer> categoryStocks = new HashMap<>();
         CompositeIterator iterator = new CompositeIterator(rootCategory.createIterator());
@@ -203,6 +225,7 @@ public class InventoryManager {
         return categoryStocks;
     }
 
+    // Returns a list of all products with their category, name, and stock level uses the CompositeIterator to iterate through the categories and products.
     public List<Object[]> getAllProducts() {
         List<Object[]> products = new ArrayList<>();
         CompositeIterator iterator = new CompositeIterator(rootCategory.createIterator());
@@ -223,6 +246,10 @@ public class InventoryManager {
         return products;
     }
 
+    /*
+     * Adds a new category to the inventory.
+     * If the parent category is not specified, the new category is added to the root category.
+     */
     public void addCategory(String parentCategoryName, String newCategoryName) {
         ProductComponent newCategory = categoryFactory.create(newCategoryName);
         if (parentCategoryName == null || parentCategoryName.isEmpty()) {
@@ -241,6 +268,7 @@ public class InventoryManager {
         }
     }
 
+    // Changes a product to be part of the root category.
     public void changeToRootCategory(String name) {
         ProductComponent component = findProductByName(name);
         if (component != null) {
@@ -257,6 +285,7 @@ public class InventoryManager {
         }
     }
 
+    // Finds the current category of a product component. Uses the CompositeIterator to iterate through the categories and products.
     private ProductCategory findCurrentCategory(ProductComponent component) {
         CompositeIterator iterator = new CompositeIterator(rootCategory.createIterator());
         ProductCategory currentCategory = null;
@@ -270,6 +299,7 @@ public class InventoryManager {
         return null;
     }
 
+    // Changes the category of a product by their names.
     public boolean changeProductCategoryByName(String productName, String newCategoryName) {
         ProductComponent product = findProductByName(productName);
         ProductComponent newCategory = findProductByName(newCategoryName);

@@ -4,6 +4,10 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+/*
+ * The ProductCategory class represents a composite node in the Composite pattern.
+ * It holds instances of ProductComponents in a List and can contain both Products and other ProductCategories.
+ */
 public class ProductCategory extends ProductComponent {
     private String categoryName;
     private List<ProductComponent> components = new ArrayList<>();
@@ -12,6 +16,10 @@ public class ProductCategory extends ProductComponent {
         this.categoryName = categoryName;
     }
 
+    /*
+     * Adds a ProductComponent to the category.
+     * Products are added at the beginning of the list, while ProductCategories are added at the end.
+     */
     @Override
     public void add(ProductComponent component) {
         if (component instanceof Product) {
@@ -51,13 +59,17 @@ public class ProductCategory extends ProductComponent {
         return components;
     }
 
+    /*
+     * Checks if a certain ProductComponent is a subcategory of this ProductCategory.
+     * This method performs a recursive search.
+     */
     @Override
     public boolean isSubcategory(ProductComponent category) {
         for (ProductComponent component : components) {
             if (component == category) {
                 return true;
             } else if (component instanceof ProductCategory) {
-                if (component.isSubcategory(category)) {
+                if (component.isSubcategory(category)) { // Does this recursively until it finds the category
                     return true;
                 }
             }
@@ -65,6 +77,10 @@ public class ProductCategory extends ProductComponent {
         return false;
     }
 
+    /*
+     * Creates an iterator for the list of ProductComponents.
+     * This is used in the CompositeIterator to iterate over the list of ProductComponents.
+     */
     @Override
     public Iterator<ProductComponent> createIterator() {
         return components.iterator();

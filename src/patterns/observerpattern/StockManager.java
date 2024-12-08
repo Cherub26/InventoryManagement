@@ -5,6 +5,10 @@ import patterns.compositepattern.Product;
 import java.util.ArrayList;
 import java.util.List;
 
+/*
+ * The StockManager class implements the Subject interface.
+ * It manages a list of observers and notifies them of changes in a Product.
+ */
 public class StockManager implements Subject {
     private List<Observer> observers = new ArrayList<>();
 
@@ -18,6 +22,7 @@ public class StockManager implements Subject {
         observers.remove(observer);
     }
 
+    // Notifies all registered observers of a change in the Product.
     @Override
     public void notifyObservers(Product product) {
         for (Observer observer : observers) {
